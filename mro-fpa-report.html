@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRO 库存 FPA 摘要 — 2026年5月</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:     #e63946;
+    --amber:   #f4a261;
+    --green:   #2a9d8f;
+    --blue:    #457b9d;
+    --dark:    #0d1117;
+    --panel:   #131a22;
+    --border:  #1e2d3d;
+    --text:    #c9d1d9;
+    --dim:     #6e7f8d;
+    --mono:    'Share Tech Mono', monospace;
+    --cond:    'Barlow Condensed', sans-serif;
+    --body:    'Barlow', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+    padding: 0;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.04) 2px,
+      rgba(0,0,0,0.04) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(69,123,157,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(69,123,157,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 32px 40px;
+  }
+
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    gap: 20px;
+  }
+
+  .header-left { flex: 1; }
+
+  .alert-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(230,57,70,0.15);
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    margin-bottom: 10px;
+    animation: blink 2s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+  }
+
+  .alert-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: blink 1s step-end infinite;
+  }
+
+  h1 {
+    font-family: var(--cond);
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  h1 span { color: var(--red); }
+
+  .subtitle {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  .header-meta {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    line-height: 1.8;
+    flex-shrink: 0;
+  }
+
+  .header-meta strong { color: var(--amber); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    position: relative;
+  }
+
+  .panel-title {
+    font-family: var(--cond);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .kpi {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+  }
+
+  .kpi.red::before    { background: var(--red); }
+  .kpi.amber::before  { background: var(--amber); }
+  .kpi.blue::before   { background: var(--blue); }
+  .kpi.green::before  { background: var(--green); }
+
+  .kpi-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .kpi-value {
+    font-family: var(--cond);
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+  }
+
+  .kpi-value.red   { color: var(--red); }
+  .kpi-value.amber { color: var(--amber); }
+  .kpi-value.green { color: var(--green); }
+
+  .kpi-sub {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* SKU Detail Grid (below main) */
+  .sku-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .sku-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sku-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+  }
+
+  .sku-card.critical::before { background: var(--red); }
+  .sku-card.warning::before  { background: var(--amber); }
+  .sku-card.normal::before   { background: var(--blue); }
+
+  .sku-code {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  .sku-name {
+    font-family: var(--cond);
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin: 4px 0 8px;
+  }
+
+  .sku-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(30,45,61,0.6);
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .sku-stat:last-child { border-bottom: none; }
+
+  .sku-stat-label { color: var(--dim); }
+  .sku-stat-val   { color: var(--text); font-family: var(--mono); }
+
+  .sku-stat-val.red   { color: var(--red); }
+  .sku-stat-val.amber { color: var(--amber); }
+  .sku-stat-val.green { color: var(--green); }
+
+  .stock-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .stock-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .stock-bar-fill {
+    height: 100%;
+    border-radius: 1px;
+    transition: width 1s ease;
+  }
+
+  .status-pill {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .pill-critical { background: rgba(230,57,70,0.2);  color: var(--red);   border: 1px solid var(--red); }
+  .pill-warning  { background: rgba(244,162,97,0.2); color: var(--amber); border: 1px solid var(--amber); }
+  .pill-watch    { background: rgba(69,123,157,0.2); color: var(--blue);  border: 1px solid var(--blue); }
+  .pill-ok       { background: rgba(42,157,143,0.2); color: var(--green); border: 1px solid var(--green); }
+
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .summary-table { width: 100%; border-collapse: collapse; }
+  .summary-table th {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--dim);
+    text-align: left;
+    padding: 0 8px 8px;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+  }
+  .summary-table td {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 9px 8px;
+    border-bottom: 1px solid rgba(30,45,61,0.6);
+    vertical-align: middle;
+  }
+  .summary-table tr:last-child td { border-bottom: none; }
+
+  .recommend-box {
+    background: rgba(42,157,143,0.08);
+    border: 1px solid rgba(42,157,143,0.4);
+    padding: 14px 16px;
+    margin-top: 6px;
+  }
+
+  .rec-item {
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(42,157,143,0.15);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--text);
+    align-items: flex-start;
+  }
+
+  .rec-item:last-child { border-bottom: none; }
+
+  .rec-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--green);
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .footer {
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  .footer span { color: var(--amber); }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .kpi      { animation: fadeUp 0.5s ease both; }
+  .kpi:nth-child(1) { animation-delay: 0.05s; }
+  .kpi:nth-child(2) { animation-delay: 0.10s; }
+  .kpi:nth-child(3) { animation-delay: 0.15s; }
+  .kpi:nth-child(4) { animation-delay: 0.20s; }
+  .kpi:nth-child(5) { animation-delay: 0.25s; }
+
+  .panel, .sku-card { animation: fadeUp 0.5s ease 0.3s both; }
+
+  .formula-box {
+    background: rgba(244,162,97,0.07);
+    border: 1px solid rgba(244,162,97,0.3);
+    padding: 12px 14px;
+    margin-top: 8px;
+    border-radius: 2px;
+  }
+
+  .formula {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+    line-height: 1.8;
+  }
+
+  .formula .var { color: #fff; }
+  .formula .op  { color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="alert-badge"><div class="alert-dot"></div> MRO FPA REPORT — MAY 2026</div>
+      <h1>MRO 库存 <span>FPA 摘要</span></h1>
+      <div class="subtitle">MAINTENANCE, REPAIR &amp; OPERATIONS · 3 SKUs · INVENTORY FINANCIAL KPI DASHBOARD</div>
+    </div>
+    <div class="header-meta">
+      REPORT DATE: <strong>17 MAY 2026</strong><br>
+      CURRENCY: <strong>CNY (¥)</strong><br>
+      ANALYSIS PERIOD: <strong>MONTHLY</strong><br>
+      SKU COVERAGE: <strong>MRO-1001 · MRO-1002 · MRO-1003</strong><br>
+      STATUS: <strong style="color:var(--red)">TWO SKUs AT STOCKOUT RISK</strong>
+    </div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi red">
+      <div class="kpi-label">库存总金额</div>
+      <div class="kpi-value red">¥47.7K</div>
+      <div class="kpi-sub">3 SKUs inventory value</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">缺货风险敞口</div>
+      <div class="kpi-value amber">¥46.7K</div>
+      <div class="kpi-sub">gap to ROP × unit cost</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">库存周转率</div>
+      <div class="kpi-value">21.2×</div>
+      <div class="kpi-sub">annual turns</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">年度持有成本</div>
+      <div class="kpi-value amber">¥11.9K</div>
+      <div class="kpi-sub">@ 25% holding rate</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-label">GMROI</div>
+      <div class="kpi-value green">21.2</div>
+      <div class="kpi-sub">gross margin ROI</div>
+    </div>
+  </div>
+
+  <!-- SKU Detail Cards -->
+  <div class="sku-detail-grid">
+
+    <!-- MRO-1001 -->
+    <div class="sku-card critical">
+      <div class="sku-code">MRO-1001</div>
+      <div class="sku-name">Bearing Assembly</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div class="stock-bar-wrap" style="flex:1;">
+          <div class="stock-bar-bg"><div class="stock-bar-fill" style="width:52%;background:var(--red)"></div></div>
+          <span style="font-size:9px;color:var(--dim)">52%</span>
+        </div>
+        <span class="status-pill pill-critical">缺货风险高</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">On-Hand / ROP</span>
+        <span class="sku-stat-val red">95 / 183</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">安全库存 (SS)</span>
+        <span class="sku-stat-val amber">63</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">库存周数</span>
+        <span class="sku-stat-val red">2.4 周</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">库存金额</span>
+        <span class="sku-stat-val amber">¥23,750</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">年度持有成本</span>
+        <span class="sku-stat-val">¥5,938</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">EOQ</span>
+        <span class="sku-stat-val">100</span>
+      </div>
+    </div>
+
+    <!-- MRO-1002 -->
+    <div class="sku-card critical">
+      <div class="sku-code">MRO-1002</div>
+      <div class="sku-name">Hydraulic Seal Kit</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div class="stock-bar-wrap" style="flex:1;">
+          <div class="stock-bar-bg"><div class="stock-bar-fill" style="width:14%;background:var(--red)"></div></div>
+          <span style="font-size:9px;color:var(--dim)">14%</span>
+        </div>
+        <span class="status-pill pill-critical">紧急补货</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">On-Hand / ROP</span>
+        <span class="sku-stat-val red">22 / 159</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">安全库存 (SS)</span>
+        <span class="sku-stat-val amber">69</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">库存周数</span>
+        <span class="sku-stat-val red">1.2 周</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">库存金额</span>
+        <span class="sku-stat-val amber">¥3,960</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">年度持有成本</span>
+        <span class="sku-stat-val">¥990</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">EOQ</span>
+        <span class="sku-stat-val">79</span>
+      </div>
+    </div>
+
+    <!-- MRO-1003 -->
+    <div class="sku-card warning">
+      <div class="sku-code">MRO-1003</div>
+      <div class="sku-name">Drive Belt</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div class="stock-bar-wrap" style="flex:1;">
+          <div class="stock-bar-bg"><div class="stock-bar-fill" style="width:127%;background:var(--green)"></div></div>
+          <span style="font-size:9px;color:var(--dim)">127%</span>
+        </div>
+        <span class="status-pill pill-warning">需关注</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">On-Hand / ROP</span>
+        <span class="sku-stat-val amber">210 / 166</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">安全库存 (SS)</span>
+        <span class="sku-stat-val green">36</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">库存周数</span>
+        <span class="sku-stat-val amber">3.2 周</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">库存金额</span>
+        <span class="sku-stat-val">¥19,950</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">年度持有成本</span>
+        <span class="sku-stat-val">¥4,988</span>
+      </div>
+      <div class="sku-stat">
+        <span class="sku-stat-label">EOQ</span>
+        <span class="sku-stat-val">207</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Grid: KPIs + Recommendations -->
+  <div class="bottom-grid">
+
+    <!-- Consolidated KPI Table -->
+    <div class="panel">
+      <div class="panel-title">Consolidated Financial KPIs</div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>KPI</th>
+            <th>Value</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--text)">库存总金额</td>
+            <td style="color:var(--red);font-weight:bold;">¥47,660</td>
+            <td style="color:var(--dim);font-size:10px;">3 SKUs total</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">年度持有成本 (Carrying Cost)</td>
+            <td style="color:var(--amber);font-weight:bold;">¥11,916</td>
+            <td style="color:var(--dim);font-size:10px;">@ 25% holding rate</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">缺货风险敞口</td>
+            <td style="color:var(--red);font-weight:bold;">¥46,660</td>
+            <td style="color:var(--dim);font-size:10px;">ROP shortage × unit cost</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">库存周转率</td>
+            <td style="color:var(--green);font-weight:bold;">21.2×</td>
+            <td style="color:var(--dim);font-size:10px;">Annual demand / avg inventory</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">GMROI</td>
+            <td style="color:var(--green);font-weight:bold;">21.2</td>
+            <td style="color:var(--dim);font-size:10px;">Gross margin return on inventory</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">年度需求量 (Value)</td>
+            <td style="color:var(--text);font-weight:bold;">¥1,009,580</td>
+            <td style="color:var(--dim);font-size:10px;">Annual demand × unit cost</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">总安全库存投资</td>
+            <td style="color:var(--amber);font-weight:bold;">¥30,840</td>
+            <td style="color:var(--dim);font-size:10px;">SS units × unit cost</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">服务水平 (Agg.)</td>
+            <td style="color:var(--text);font-weight:bold;">90–98%</td>
+            <td style="color:var(--dim);font-size:10px;">Range across 3 SKUs</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="panel">
+      <div class="panel-title">Recommendations</div>
+      <div style="font-size:11px;color:var(--dim);line-height:1.6;margin-bottom:10px;">
+        Based on computed KPIs and stockout risk analysis, the following actions are recommended:
+      </div>
+
+      <div class="recommend-box">
+        <div class="rec-item">
+          <div class="rec-num">[01]</div>
+          <div><strong>立即补货 MRO-1002 (Hydraulic Seal Kit)</strong> — 现有库存仅 22 单位，远低于 ROP 159，按 1.2 周消耗速度即将缺货。建议加急 PO 至少 137 单位。</div>
+        </div>
+        <div class="rec-item">
+          <div class="rec-num">[02]</div>
+          <div><strong>安排 MRO-1001 补货计划</strong> — 现有 95 单位略超 ROP 的 50%，但库存周转为 2.4 周，需在 2 周内下单 100 单位（EOQ）。</div>
+        </div>
+        <div class="rec-item">
+          <div class="rec-num">[03]</div>
+          <div><strong>评估 MRO-1003 库存优化机会</strong> — 当前库存 210 单位超过 ROP 166 和 EOQ 水平，如需求稳定可考虑调整补货节奏释放资金。</div>
+        </div>
+        <div class="rec-item">
+          <div class="rec-num">[04]</div>
+          <div><strong>检讨服务水平策略</strong> — MRO-1002 98% SL 安全库存成本 ¥12,420 (69 单位 × ¥180)，如接受 95% SL，SS 可降至 ~40 单位，减少安全库存投资 42%。</div>
+        </div>
+        <div class="rec-item">
+          <div class="rec-num">[05]</div>
+          <div><strong>建立供应商提前期监控机制</strong> — MRO-1001 (LT=3周, LT CV=27%) 和 MRO-1002 (LT=5周, LT CV=30%) 提前期波动较大，建议设置每周 LT 跟踪告警。</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROP Formula Section -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+    <div class="panel">
+      <div class="panel-title">ROP Formula — Per SKU</div>
+      <div class="formula-box">
+        <div class="formula">
+          <span style="color:var(--dim);font-size:10px;letter-spacing:1px;">SS = Z × √(LT × σ<sub>d</sub>² + d² × σ<sub>LT</sub>²)</span><br>
+          <span style="color:var(--dim);font-size:10px;letter-spacing:1px;">ROP = d × LT + SS</span>
+        </div>
+      </div>
+      <table class="summary-table" style="margin-top:10px;">
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>d/wk</th>
+            <th>LT (wk)</th>
+            <th>SS</th>
+            <th>ROP</th>
+            <th>Z (SL)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MRO-1001</td>
+            <td>40</td>
+            <td>3</td>
+            <td style="color:var(--amber)">63</td>
+            <td style="color:var(--red)">183</td>
+            <td>1.65 (95%)</td>
+          </tr>
+          <tr>
+            <td>MRO-1002</td>
+            <td>18</td>
+            <td>5</td>
+            <td style="color:var(--amber)">69</td>
+            <td style="color:var(--red)">159</td>
+            <td>2.05 (98%)</td>
+          </tr>
+          <tr>
+            <td>MRO-1003</td>
+            <td>65</td>
+            <td>2</td>
+            <td style="color:var(--green)">36</td>
+            <td style="color:var(--amber)">166</td>
+            <td>1.28 (90%)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Risk &amp; Data Quality Notes</div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--text)">需求数据</td>
+            <td><span class="status-pill pill-watch">模拟数据</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">提前期数据</td>
+            <td><span class="status-pill pill-watch">模拟数据</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">单位成本</td>
+            <td><span class="status-pill pill-watch">估算值</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">持有成本率</td>
+            <td><span class="status-pill pill-ok">行业标准 25%</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">缺货成本</td>
+            <td><span class="status-pill pill-critical">未输入</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text)">ERP 集成</td>
+            <td><span class="status-pill pill-watch">待配置</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="font-size:10px;color:var(--dim);margin-top:10px;line-height:1.6;">
+        <strong style="color:var(--amber);">△ 数据说明：</strong>当前报表使用模拟数据（来自 supply-chain-analyst skill 的 mock dataset）。实际 ERP/WMS 数据接入后需替换：需求历史、单位成本、供应商提前期。持有成本率 25% 为行业默认值，可根据企业实际资金成本调整。
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>MRO INVENTORY MANAGEMENT · FINANCIAL PLANNING &amp; ANALYSIS · CONFIDENTIAL</div>
+    <div>PREPARED BY: <span>HERMES AGENT (MULTICA)</span> · CREATED: <span>17 MAY 2026</span></div>
+    <div>DATA SOURCE: <span>SUPPLY CHAIN FPA AGENT SYSTEM · MOCK DATASET</span></div>
+  </div>
+
+</div>
+</body>
+</html>
