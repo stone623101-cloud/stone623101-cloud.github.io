@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MRO 库存 FPA 摘要 — 2026年5月</title>
+<title>MRO Inventory Report — 2026年5月</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -115,7 +115,7 @@
     color: #fff;
   }
 
-  h1 span { color: var(--red); }
+  h1 span { color: var(--blue); }
 
   .subtitle {
     font-family: var(--mono);
@@ -165,7 +165,7 @@
 
   .kpi-row {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     margin-bottom: 20px;
   }
@@ -393,7 +393,6 @@
   .kpi:nth-child(2) { animation-delay: 0.10s; }
   .kpi:nth-child(3) { animation-delay: 0.15s; }
   .kpi:nth-child(4) { animation-delay: 0.20s; }
-  .kpi:nth-child(5) { animation-delay: 0.25s; }
 
   .panel, .sku-card { animation: fadeUp 0.5s ease 0.3s both; }
 
@@ -421,8 +420,8 @@
 
   <div class="header">
     <div class="header-left">
-      <div class="alert-badge"><div class="alert-dot"></div> MRO FPA REPORT — MAY 2026</div>
-      <h1>MRO 库存 <span>FPA 摘要</span></h1>
+      <div class="alert-badge"><div class="alert-dot"></div> MRO INVENTORY REPORT — MAY 2026</div>
+      <h1>MRO <span>Inventory Report</span></h1>
       <div class="subtitle">MAINTENANCE, REPAIR &amp; OPERATIONS · 3 SKUs · INVENTORY FINANCIAL KPI DASHBOARD</div>
     </div>
     <div class="header-meta">
@@ -434,7 +433,7 @@
     </div>
   </div>
 
-  <!-- KPI Row -->
+  <!-- KPI Row (4 cards — GMROI removed) -->
   <div class="kpi-row">
     <div class="kpi red">
       <div class="kpi-label">库存总金额</div>
@@ -455,11 +454,6 @@
       <div class="kpi-label">年度持有成本</div>
       <div class="kpi-value amber">¥11.9K</div>
       <div class="kpi-sub">@ 25% holding rate</div>
-    </div>
-    <div class="kpi green">
-      <div class="kpi-label">GMROI</div>
-      <div class="kpi-value green">21.2</div>
-      <div class="kpi-sub">gross margin ROI</div>
     </div>
   </div>
 
@@ -613,11 +607,6 @@
             <td style="color:var(--text)">库存周转率</td>
             <td style="color:var(--green);font-weight:bold;">21.2×</td>
             <td style="color:var(--dim);font-size:10px;">Annual demand / avg inventory</td>
-          </tr>
-          <tr>
-            <td style="color:var(--text)">GMROI</td>
-            <td style="color:var(--green);font-weight:bold;">21.2</td>
-            <td style="color:var(--dim);font-size:10px;">Gross margin return on inventory</td>
           </tr>
           <tr>
             <td style="color:var(--text)">年度需求量 (Value)</td>
