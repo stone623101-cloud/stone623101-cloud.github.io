@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Execution Control Tower</title>
+  <style>
+    :root {
+      --bg: #f4f6f6;
+      --primary: rgba(142, 154, 157, 0.85);
+      --primary-solid: #8e9a9d;
+      --primary-light: #b2bcbe;
+      --text: #2c3e50;
+      --muted: #6f7f85;
+      --line: rgba(189, 195, 199, 0.4);
+      --critical-bg: #fadbd8;
+      --critical-text: #78281f;
+      --warning-bg: #fdebd0;
+      --warning-text: #7e5109;
+      --normal-bg: #d5f5e3;
+      --normal-text: #145a32;
+      --missing-bg: #fef9e7;
+      --missing-text: #7d6608;
+      --missing-line: #f4d03f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    .page {
+      width: min(1240px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    header {
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 28px rgba(44, 62, 80, 0.08);
+    }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    header p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .kpi-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .mode-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .owner-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      padding: 15px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #8e9a9d 0%, #b2bcbe 100%);
+    }
+
+    .section-title {
+      margin: 4px 0 12px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .kpi .label,
+    .owner-card .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .kpi .value {
+      margin-top: 8px;
+      font-size: 30px;
+      font-weight: 750;
+    }
+
+    .kpi .hint {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .critical {
+      background: var(--critical-bg);
+      color: var(--critical-text);
+    }
+
+    .warning {
+      background: var(--warning-bg);
+      color: var(--warning-text);
+    }
+
+    .normal {
+      background: var(--normal-bg);
+      color: var(--normal-text);
+    }
+
+    .missing {
+      background: var(--missing-bg);
+      color: var(--missing-text);
+      border: 1px dashed var(--missing-line);
+    }
+
+    .unspecified {
+      background: var(--missing-bg);
+      color: var(--missing-text);
+      border: 1px dashed var(--missing-line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 10px 9px;
+      border-bottom: 1px solid rgba(189, 195, 199, 0.28);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-weight: 700;
+      background: rgba(244, 246, 246, 0.72);
+    }
+
+    tr.missing-row {
+      background: #fffdf1;
+      animation: missingPulse 2.6s ease-in-out infinite;
+    }
+
+    @keyframes missingPulse {
+      0%, 100% { box-shadow: inset 3px 0 0 rgba(244, 208, 63, 0.35); }
+      50% { box-shadow: inset 3px 0 0 rgba(244, 208, 63, 0.95); }
+    }
+
+    .mode-table td:last-child,
+    .mode-table th:last-child {
+      text-align: right;
+    }
+
+    .owner-card h3 {
+      margin: 4px 0 10px;
+      font-size: 16px;
+    }
+
+    .owner-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .owner-metrics div {
+      background: #f8fafa;
+      border: 1px solid rgba(189, 195, 199, 0.28);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .owner-metrics strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .source-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 980px) {
+      .kpi-grid,
+      .mode-grid,
+      .owner-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .page {
+        width: min(100% - 20px, 1240px);
+        padding-top: 16px;
+      }
+
+      header {
+        padding: 18px;
+      }
+
+      header h1 {
+        font-size: 22px;
+      }
+
+      .kpi-grid,
+      .mode-grid,
+      .owner-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <h1>Daily Execution Control Tower</h1>
+      <p>Mock validation dashboard generated from 13 multimodal logistics records on 2026-05-18 11:50 Asia/Shanghai.</p>
+    </header>
+
+    <section class="grid kpi-grid" aria-label="Top KPI Summary">
+      <article class="card kpi">
+        <div class="label">Active Shipments</div>
+        <div class="value">13</div>
+        <div class="hint">Across 6 owner buckets</div>
+      </article>
+      <article class="card kpi">
+        <div class="label">Critical Delay</div>
+        <div class="value">3</div>
+        <div class="hint">Ocean, Air, Truck</div>
+      </article>
+      <article class="card kpi">
+        <div class="label">Potential Delay</div>
+        <div class="value">4</div>
+        <div class="hint">Including Unassigned</div>
+      </article>
+      <article class="card kpi">
+        <div class="label">Normal</div>
+        <div class="value">4</div>
+        <div class="hint">Within SLA baseline</div>
+      </article>
+      <article class="card kpi">
+        <div class="label">Missing Time Data</div>
+        <div class="value">1</div>
+        <div class="hint">Highlighted in queue</div>
+      </article>
+      <article class="card kpi">
+        <div class="label">Mode Unspecified</div>
+        <div class="value">1</div>
+        <div class="hint">Requires booking update</div>
+      </article>
+    </section>
+
+    <section class="stack">
+      <article class="card">
+        <h2 class="section-title">Mode-Level Exception Summary</h2>
+        <table class="mode-table">
+          <thead>
+            <tr>
+              <th>Mode</th>
+              <th>Normal</th>
+              <th>Potential</th>
+              <th>Critical</th>
+              <th>Missing</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Ocean</td><td>1</td><td>0</td><td>1</td><td>1</td><td>3</td></tr>
+            <tr><td>Air</td><td>0</td><td>2</td><td>1</td><td>0</td><td>3</td></tr>
+            <tr><td>Rail</td><td>1</td><td>1</td><td>0</td><td>0</td><td>2</td></tr>
+            <tr><td>Truck</td><td>2</td><td>0</td><td>1</td><td>0</td><td>3</td></tr>
+            <tr><td>Origin Pickup</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+            <tr><td>Mode Unspecified</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <section class="grid owner-grid" aria-label="Team Overviews">
+        <article class="card owner-card">
+          <div class="label">Owner Bucket</div>
+          <h3>Alice Chen</h3>
+          <span class="badge critical">1 Critical</span>
+          <span class="badge warning">1 Potential</span>
+          <div class="owner-metrics">
+            <div><strong>3</strong><span class="label">Active</span></div>
+            <div><strong>1</strong><span class="label">Normal</span></div>
+            <div><strong>0</strong><span class="label">Missing</span></div>
+          </div>
+        </article>
+        <article class="card owner-card">
+          <div class="label">Owner Bucket</div>
+          <h3>Ben Carter</h3>
+          <span class="badge critical">1 Critical</span>
+          <span class="badge warning">1 Potential</span>
+          <div class="owner-metrics">
+            <div><strong>2</strong><span class="label">Active</span></div>
+            <div><strong>0</strong><span class="label">Normal</span></div>
+            <div><strong>0</strong><span class="label">Missing</span></div>
+          </div>
+        </article>
+        <article class="card owner-card">
+          <div class="label">Owner Bucket</div>
+          <h3>Chloe Wang</h3>
+          <span class="badge warning">1 Potential</span>
+          <span class="badge normal">1 Normal</span>
+          <div class="owner-metrics">
+            <div><strong>2</strong><span class="label">Active</span></div>
+            <div><strong>1</strong><span class="label">Normal</span></div>
+            <div><strong>0</strong><span class="label">Missing</span></div>
+          </div>
+        </article>
+        <article class="card owner-card">
+          <div class="label">Owner Bucket</div>
+          <h3>Diana Liu</h3>
+          <span class="badge critical">1 Critical</span>
+          <span class="badge normal">1 Normal</span>
+          <div class="owner-metrics">
+            <div><strong>2</strong><span class="label">Active</span></div>
+            <div><strong>1</strong><span class="label">Normal</span></div>
+            <div><strong>0</strong><span class="label">Missing</span></div>
+          </div>
+        </article>
+        <article class="card owner-card">
+          <div class="label">Owner Bucket</div>
+          <h3>Frank Zhao</h3>
+          <span class="badge missing">1 Missing Time</span>
+          <div class="owner-metrics">
+            <div><strong>1</strong><span class="label">Active</span></div>
+            <div><strong>0</strong><span class="label">Normal</span></div>
+            <div><strong>1</strong><span class="label">Missing</span></div>
+          </div>
+        </article>
+        <article class="card owner-card">
+          <div class="label">Owner Bucket</div>
+          <h3>Unassigned</h3>
+          <span class="badge warning">1 Potential</span>
+          <div class="owner-metrics">
+            <div><strong>1</strong><span class="label">Active</span></div>
+            <div><strong>0</strong><span class="label">Normal</span></div>
+            <div><strong>0</strong><span class="label">Missing</span></div>
+          </div>
+        </article>
+      </section>
+
+      <article class="card">
+        <h2 class="section-title">Exception-First Shipment Queue</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Owner</th>
+              <th>Shipment</th>
+              <th>Mode</th>
+              <th>Carrier</th>
+              <th>ETA</th>
+              <th>ATA</th>
+              <th>Variance</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Alice Chen</td><td>SHP-OCE-1002</td><td>Ocean</td><td>MSC</td><td>2026-05-14 10:00</td><td>2026-05-18 16:00</td><td>102.0h</td><td><span class="badge critical">Critical Delay</span></td></tr>
+            <tr><td>Alice Chen</td><td>SHP-PUP-5001</td><td>Origin Pickup</td><td>Local Drayage Partner</td><td>2026-05-17 09:00</td><td>2026-05-18 04:00</td><td>19.0h</td><td><span class="badge warning">Potential Delay</span></td></tr>
+            <tr><td>Alice Chen</td><td>SHP-OCE-1001</td><td>Ocean</td><td>Maersk</td><td>2026-05-15 08:00</td><td>2026-05-15 20:00</td><td>12.0h</td><td><span class="badge normal">Normal</span></td></tr>
+            <tr><td>Ben Carter</td><td>SHP-AIR-2002</td><td>Air</td><td>Lufthansa Cargo</td><td>2026-05-17 09:00</td><td>2026-05-18 02:00</td><td>17.0h</td><td><span class="badge critical">Critical Delay</span></td></tr>
+            <tr><td>Ben Carter</td><td>SHP-AIR-2001</td><td>Air</td><td>Cathay Cargo</td><td>2026-05-18 08:00</td><td>2026-05-18 14:00</td><td>6.0h</td><td><span class="badge warning">Potential Delay</span></td></tr>
+            <tr><td>Chloe Wang</td><td>SHP-RAL-3002</td><td>Rail</td><td>DB Cargo</td><td>2026-05-14 12:00</td><td>2026-05-16 22:00</td><td>58.0h</td><td><span class="badge warning">Potential Delay</span></td></tr>
+            <tr><td>Chloe Wang</td><td>SHP-RAL-3001</td><td>Rail</td><td>China Railway Express</td><td>2026-05-16 12:00</td><td>2026-05-17 08:00</td><td>20.0h</td><td><span class="badge normal">Normal</span></td></tr>
+            <tr><td>Diana Liu</td><td>SHP-TRK-4002</td><td>Truck</td><td>SwiftCross Trucking</td><td>2026-05-18 05:00</td><td>2026-05-18 13:00</td><td>8.0h</td><td><span class="badge critical">Critical Delay</span></td></tr>
+            <tr><td>Diana Liu</td><td>SHP-TRK-4001</td><td>Truck</td><td>BorderLink Fleet</td><td>2026-05-18 06:00</td><td>2026-05-18 07:30</td><td>1.5h</td><td><span class="badge normal">Normal</span></td></tr>
+            <tr><td>Evan Miller</td><td>SHP-UNK-6001</td><td>Mode Unspecified</td><td>Unknown Booking Source</td><td>2026-05-18 09:00</td><td>2026-05-18 11:00</td><td>2.0h</td><td><span class="badge unspecified">Mode Unspecified</span></td></tr>
+            <tr class="missing-row"><td>Frank Zhao</td><td>SHP-MIS-7001</td><td>Ocean</td><td>COSCO</td><td>2026-05-18 10:00</td><td>Missing</td><td>N/A</td><td><span class="badge missing">Missing Time Data</span></td></tr>
+            <tr><td>Unassigned</td><td>SHP-AIR-8001</td><td>Air</td><td>Emirates SkyCargo</td><td>2026-05-18 09:00</td><td>2026-05-18 20:00</td><td>11.0h</td><td><span class="badge warning">Potential Delay</span></td></tr>
+            <tr><td>Gina Patel</td><td>Unknown Shipment #13</td><td>Truck</td><td>Unknown Carrier</td><td>2026-05-18 05:00</td><td>2026-05-18 05:45</td><td>0.75h</td><td><span class="badge normal">Normal</span></td></tr>
+          </tbody>
+        </table>
+        <p class="source-note">Source data file: mock-logistics-data.csv. Empty shipment ID and carrier values were retained with readable placeholders.</p>
+      </article>
+
+      <article class="card">
+        <h2 class="section-title">Multi-Modal Milestone Deviation Reference Matrix</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Mode</th>
+              <th>Normal</th>
+              <th>Potential Delay</th>
+              <th>Critical Delay</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Ocean</td><td>&lt;= 24h</td><td>&gt; 24h and &lt;= 72h</td><td>&gt; 72h</td></tr>
+            <tr><td>Rail</td><td>&lt;= 24h</td><td>&gt; 24h and &lt;= 72h</td><td>&gt; 72h</td></tr>
+            <tr><td>Air</td><td>&lt;= 4h</td><td>&gt; 4h and &lt;= 12h</td><td>&gt; 12h</td></tr>
+            <tr><td>Truck</td><td>&lt;= 2h</td><td>&gt; 2h and &lt;= 6h</td><td>&gt; 6h</td></tr>
+            <tr><td>Origin Pickup</td><td>&lt;= 12h</td><td>&gt; 12h and &lt;= 24h</td><td>&gt; 24h</td></tr>
+          </tbody>
+        </table>
+        <p class="source-note">Note: This matrix represents the hardcoded underlying SLA threshold baseline for operational monitoring. Should operational parameters or internal KPIs shift, notify the system architect immediately to refactor this skill layer logic.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
