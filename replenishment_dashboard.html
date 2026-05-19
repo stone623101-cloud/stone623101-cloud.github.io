@@ -42,7 +42,7 @@
     background-attachment: fixed;
   }
   .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  .wrap { max-width: 1480px; margin: 0 auto; padding: 28px 32px 80px; }
+  .wrap { max-width: min(1860px, 96vw); margin: 0 auto; padding: 28px 32px 80px; }
 
   @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   .rise { opacity: 0; animation: rise .55s cubic-bezier(.2,.7,.2,1) forwards; }
@@ -204,13 +204,13 @@
     position: sticky; top: 0; z-index: 2;
     background: var(--panel-2); color: var(--ink-faint);
     text-transform: uppercase; letter-spacing: .06em; font-size: 10px; font-weight: 700;
-    padding: 11px 12px; text-align: left; white-space: nowrap;
+    padding: 11px 9px; text-align: left; white-space: nowrap;
     border-bottom: 1px solid var(--border-lum); cursor: pointer; user-select: none;
   }
   thead th.numcol { text-align: right; }
   thead th:hover { color: var(--accent); }
   thead th .arr { color: var(--accent); font-size: 9px; }
-  tbody td { padding: 9px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; color: var(--ink-dim); }
+  tbody td { padding: 9px 9px; border-bottom: 1px solid var(--border); white-space: nowrap; color: var(--ink-dim); }
   tbody td.numcol { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
   tbody td.skuid { font-family: var(--mono); color: var(--accent); }
   tbody td.name { color: var(--ink); }
